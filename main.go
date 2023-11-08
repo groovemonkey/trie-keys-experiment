@@ -74,16 +74,16 @@ func (t *Trie[T]) SearchPrefix(prefix string) map[string]*trieNode[T] {
 		return keysAndVals
 	}
 	// find all descendants of the node, after trimming the prefix (TODO(dcohen) explain why)
-	return getDescendants[T](node, prefix, make(map[string]*trieNode[T]))
+	// NOTE: we trim the prefix because getDescendants() would duplicate the first letter of the matched prefix
+	// (it immediately adds the current Node's rune to the prefix, which would duplicate the last rune)
+	trimmedPrefix := string([]rune(prefix)[:len(prefix)-1])
+	return getDescendants[T](node, trimmedPrefix, make(map[string]*trieNode[T]))
 }
 
 // getDescendants is a depth-first search starting at a node and returning a slice of descendant Nodes that represent a valid Key (they have a Value)
 // TODO(dcohen) make this faster (benchmark!) by passing the matchedNodes map by pointer instead of by value
 func getDescendants[T any](currentNode *trieNode[T], prefix string, matchedNodes map[string]*trieNode[T]) map[string]*trieNode[T] {
-	// NOTE: we trim the prefix because getDescendants() would duplicate the first letter of the matched prefix
-	// (it immediately adds the current Node's rune to the prefix, which would duplicate the last rune)
-	trimmedPrefix := string([]rune(prefix)[:len(prefix)])
-	stringUntilNow := fmt.Sprintf("%s%c", trimmedPrefix, currentNode.Char)
+	stringUntilNow := fmt.Sprintf("%s%c", prefix, currentNode.Char)
 
 	// Are we a node that contains a value? (end of a Key?)
 	if currentNode.HasValue {
