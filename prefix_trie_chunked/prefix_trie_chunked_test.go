@@ -1,4 +1,4 @@
-package main
+package prefix_trie
 
 import (
 	"math/rand"
@@ -20,7 +20,7 @@ func randInt(min int, max int) int {
 	return min + rand.Intn(max-min)
 }
 
-func BenchmarkInsertTrie(b *testing.B) {
+func BenchmarkInsertTrieChunked(b *testing.B) {
 	// make a slice of test case strings, just long enough for all benchmark runs to complete
 	testCases := make(map[int]string, b.N)
 
@@ -30,7 +30,7 @@ func BenchmarkInsertTrie(b *testing.B) {
 		testCases[i] = randString
 	}
 
-	store := NewTrie[int]()
+	store := New[int]()
 
 	// Setup complete, let's bench
 	b.ResetTimer()
@@ -40,8 +40,8 @@ func BenchmarkInsertTrie(b *testing.B) {
 	}
 }
 
-func BenchmarkSearchTrie(b *testing.B) {
-	store := NewTrie[int]()
+func BenchmarkSearchTrieChunked(b *testing.B) {
+	store := New[int]()
 	// make a slice of test case strings, just long enough for all benchmark runs to complete
 	testCases := make(map[int]string, b.N)
 
@@ -77,8 +77,8 @@ func BenchmarkSearchTrie(b *testing.B) {
 	}
 }
 
-func BenchmarkSearchPrefixTrie(b *testing.B) {
-	store := NewTrie[int]()
+func BenchmarkSearchPrefixTrieChunked(b *testing.B) {
+	store := New[int]()
 	// make a slice of test case strings, just long enough for all benchmark runs to complete
 	testCases := make(map[int]string, b.N)
 
