@@ -37,7 +37,7 @@ func (t *Trie[T]) Insert(s string, val T) {
 	}
 }
 
-func (t *Trie[T]) DepthFirstTraversal() {
+func (t *Trie[T]) DepthFirstPrint() {
 	if t.root == nil {
 		return
 	}
@@ -62,7 +62,8 @@ func (t *Trie[T]) Search(s string) (bool, *trieNode[T]) {
 	return true, currentNode
 }
 
-// TODO(dcohen)
+// SearchPrefix returns all (string) Keys with the given prefix, mapped to pointers to their value-containing trieNodes
+// a "Key" here means a trieNode that has a value associated with it, i.e. the last character of a key
 func (t *Trie[T]) SearchPrefix(prefix string) map[string]*trieNode[T] {
 	keysAndVals := make(map[string]*trieNode[T])
 	if len(prefix) == 0 {
@@ -73,7 +74,7 @@ func (t *Trie[T]) SearchPrefix(prefix string) map[string]*trieNode[T] {
 		fmt.Println("SearchPrefix: nothing found.")
 		return keysAndVals
 	}
-	// find all descendants of the node, after trimming the prefix (TODO(dcohen) explain why)
+	// find all descendants of the node, after trimming the prefix
 	// NOTE: we trim the prefix because getDescendants() would duplicate the first letter of the matched prefix
 	// (it immediately adds the current Node's rune to the prefix, which would duplicate the last rune)
 	trimmedPrefix := string([]rune(prefix)[:len(prefix)-1])
@@ -116,7 +117,7 @@ func getDescendants[T any](currentNode *trieNode[T], prefix string, matchedNodes
 func depthFirstPrint[T any](currentNode *trieNode[T], acc string) {
 	stringUntilNow := fmt.Sprintf("%s%c", acc, currentNode.Char)
 
-	// obvious problem with intentional zero values for ints
+	// Is this the last rune of a Key?
 	if currentNode.HasValue {
 		fmt.Printf("Key: %s Value: %v\n", stringUntilNow, currentNode.Value)
 	}
@@ -159,6 +160,6 @@ func main() {
 		fmt.Printf("\n%s: %v", str, node.Value)
 	}
 
-	// fmt.Println("\nPrinting trie")
-	// trie.DepthFirstTraversal()
+	fmt.Println("\n\nPrinting trie")
+	trie.DepthFirstPrint()
 }
