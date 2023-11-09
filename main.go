@@ -71,7 +71,6 @@ func (t *Trie[T]) SearchPrefix(prefix string) map[string]*trieNode[T] {
 	}
 	found, node := t.Search(prefix)
 	if !found {
-		fmt.Println("SearchPrefix: nothing found.")
 		return keysAndVals
 	}
 	// find all descendants of the node, after trimming the prefix
