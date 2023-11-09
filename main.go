@@ -151,10 +151,10 @@ func main() {
 
 	found, node = trie.Search("Hello, world!")
 	if found {
-		fmt.Printf("\nFound it! Val was %d \n", node.Value)
+		fmt.Printf("\nFound it! Val was %d\n", node.Value)
 	}
 
-	fmt.Println("Trying the prefix search with 'Hello'")
+	fmt.Print("\nTrying the prefix search with 'business_summary.revenue':")
 	matches := trie.SearchPrefix("business_summary.revenue")
 	for str, node := range matches {
 		fmt.Printf("\n%s: %v", str, node.Value)
