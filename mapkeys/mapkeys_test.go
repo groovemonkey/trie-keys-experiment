@@ -162,3 +162,39 @@ func BenchmarkSearchPrefixMap(b *testing.B) {
 		store.SearchPrefix(testString)
 	}
 }
+
+func TestAggregateDescendants(t *testing.T) {
+	mapStore := make(Store[int64])
+
+	// test simple positives
+	mapStore.Insert("one.two.three", 0)
+	mapStore.Insert("one.two.three.one", 1)
+	mapStore.Insert("one.two.three.two", 2)
+	mapStore.Insert("one.two.three.two.one", 1)
+
+	valid, sum := mapStore.AggregateDescendants("one.two.three", Sum)
+	if !valid {
+		t.Errorf("expected valid result")
+	}
+	if sum != 4 {
+		t.Errorf("expected valid sum")
+	}
+
+	// test zero
+	mapStore.Insert("floob", 0)
+	valid, sum = mapStore.AggregateDescendants("floob", Sum)
+	if !valid || (sum != 0) {
+		t.Errorf("expected valid result of 0")
+	}
+
+	// test positive, negative, and zero numbers
+	mapStore.Insert("negative", 0)
+	mapStore.Insert("negative.one", -1)
+	mapStore.Insert("negative.two", -2)
+	mapStore.Insert("negative.two.zero", 0)
+	mapStore.Insert("negative.two.one", 1)
+	valid, sum = mapStore.AggregateDescendants("negative", Sum)
+	if !valid || (sum != -2) {
+		t.Errorf("expected valid result of -2, got %v", sum)
+	}
+}

@@ -3,10 +3,20 @@ package main
 import (
 	"fmt"
 
+	"github.com/groovemonkey/trie-keys-experiment/mapkeys"
 	"github.com/groovemonkey/trie-keys-experiment/prefix_trie"
 )
 
 func main() {
+	mapStore := make(mapkeys.Store[int64])
+	mapStore.Insert("one.two.three", 0)
+	mapStore.Insert("one.two.three.one", 1)
+	mapStore.Insert("one.two.three.two", 2)
+	mapStore.Insert("one.two.three.two.one", 1)
+	_, sum := mapStore.AggregateDescendants("one.two.three", mapkeys.Sum)
+
+	fmt.Println("sum was:", sum)
+
 	trie := prefix_trie.New[int64]()
 	trie.Insert("Hello, world!", 42)
 	trie.Insert("Hello, David!", 7)
