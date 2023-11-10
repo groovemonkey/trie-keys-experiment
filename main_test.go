@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/groovemonkey/trie-keys-experiment/mapkeys"
+	"github.com/groovemonkey/trie-keys-experiment/prefix_trie"
 	"github.com/groovemonkey/trie-keys-experiment/prefix_trie_chunked"
 )
 
@@ -160,10 +161,138 @@ func BenchmarkSearchMapRealistic(b *testing.B) {
 
 }
 
-func BenchmarkSearchPrefixMapRandom(b *testing.B) {
+// this isn't a particularly good test to begin with, and it usually times out
+// func BenchmarkSearchPrefixMapRandom(b *testing.B) {
+// 	store := make(mapkeys.Store[int])
+// 	// make a slice of test case strings, just long enough for all benchmark runs to complete
+// 	data := makeRandomDataMap(b.N)
+//
+// 	// Setup complete, let's bench
+// 	var testString string
+// 	b.ResetTimer()
+//
+// 	for i := 0; i < b.N; i++ {
+// 		b.StopTimer()
+// 		// chop the string in half
+// 		testString = data[i]
+// 		half := testString[:(len(testString) / 2)]
+// 		testString = half
+// 		b.StartTimer()
+//
+// 		// The function we're testing
+// 		store.SearchPrefix(testString)
+// 	}
+// }
+
+func BenchmarkSearchPrefixMapRealistic(b *testing.B) {
 	store := make(mapkeys.Store[int])
+
+	// insert into store
+	for key, val := range realisticBenchmarkData {
+		store.Insert(key, val)
+	}
+
+	// Setup complete, let's bench
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		// short keys
+		store.SearchPrefix("business_revenue")
+
+		// medium keys
+		store.SearchPrefix("profits")
+
+		// long keys
+		store.SearchPrefix("testing")
+
+		// half of a medium key
+		store.SearchPrefix("profits.revenue.top_line")
+
+		// half of a wildly long key
+		store.SearchPrefix("testing.very.long.string.keys.with.many.many.many.many.segments.jhsdkfjhskdjhfks.kjhsdkjfhskdjhfksjhdf.kjshdkhskdjhfksjdhfkjshdfkjh.kjhsdkfjhskdjfhksjhdf.sd.sdf.sdf.sdf.sd.fs.dfs.dfs.dfs.df")
+	}
+}
+
+// /////////////////
+// // Trie (single-character)
+// /////////////////
+func BenchmarkInsertTrieRandom(b *testing.B) {
+	store := prefix_trie.New[int]()
+
 	// make a slice of test case strings, just long enough for all benchmark runs to complete
 	data := makeRandomDataMap(b.N)
+
+	// Setup complete, let's bench
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		store.Insert(data[i], i)
+	}
+}
+
+func BenchmarkInsertTrieRealistic(b *testing.B) {
+	store := prefix_trie.New[int]()
+
+	// Setup complete, let's bench
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		for key, val := range realisticBenchmarkData {
+			store.Insert(key, val)
+		}
+	}
+}
+
+func BenchmarkSearchTrieRandom(b *testing.B) {
+	store := prefix_trie.New[int]()
+
+	// make a slice of test case strings, just long enough for all benchmark runs to complete
+	data := makeRandomDataMap(b.N)
+
+	for val, key := range data {
+		// insert into store
+		store.Insert(key, val)
+	}
+
+	// Setup complete, let's bench
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		// The function we're testing
+		store.Search(data[i])
+	}
+}
+
+func BenchmarkSearchTrieRealistic(b *testing.B) {
+	store := prefix_trie.New[int]()
+
+	// insert into store
+	for key, val := range realisticBenchmarkData {
+		store.Insert(key, val)
+	}
+
+	// Setup complete, let's bench
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		for key, _ := range realisticBenchmarkData {
+			// The function we're testing
+			store.Search(key)
+		}
+	}
+
+}
+
+func BenchmarkSearchPrefixTrieRandom(b *testing.B) {
+	store := prefix_trie.New[int]()
+
+	// make a slice of test case strings, just long enough for all benchmark runs to complete
+	data := makeRandomDataMap(b.N)
+
+	for val, key := range data {
+		// insert into store
+		store.Insert(key, val)
+	}
 
 	// Setup complete, let's bench
 	var testString string
@@ -182,8 +311,8 @@ func BenchmarkSearchPrefixMapRandom(b *testing.B) {
 	}
 }
 
-func BenchmarkSearchPrefixMapRealistic(b *testing.B) {
-	store := make(mapkeys.Store[int])
+func BenchmarkSearchPrefixTrieRealistic(b *testing.B) {
+	store := prefix_trie.New[int]()
 
 	// insert into store
 	for key, val := range realisticBenchmarkData {
