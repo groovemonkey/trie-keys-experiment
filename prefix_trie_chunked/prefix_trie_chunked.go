@@ -1,4 +1,4 @@
-package prefix_trie
+package prefix_trie_chunked
 
 import (
 	"fmt"

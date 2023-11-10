@@ -1,3 +1,3 @@
-package prefix_trie
+package prefix_trie_chunked
 
 // TODO add functional tests?
