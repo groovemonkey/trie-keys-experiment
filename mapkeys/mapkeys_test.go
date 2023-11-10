@@ -13,6 +13,23 @@ func TestInsert(t *testing.T) {
 	if result != expected {
 		t.Errorf("expected store.String() to be %s, but got %s", expected, result)
 	}
+
+	// duplicate should be fine
+	store.Insert("dupecheck", 1)
+	store.Insert("dupecheck", 1)
+	found, val := store.Search("dupecheck")
+	if (!found) || (val != 1) {
+		t.Errorf("Expected duplicate Inserts to work. found=%v, val=%d", found, val)
+	}
+
+	// replacements should work
+	store.Insert("replace", 100)
+	store.Insert("replace", 300)
+	found, val = store.Search("replace")
+	if (!found) || (val != 300) {
+		t.Errorf("Expected replacements to work. found=%v, val=%d", found, val)
+	}
+
 }
 
 func TestSearch(t *testing.T) {
